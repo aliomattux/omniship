@@ -18,6 +18,8 @@
 		    <group>
 			<field name="delivery_method" required="1" on_change="onchange_delivery_method(delivery_method)" />
 			<field name="return_label" />
+			<field name="alternate_sender_address" attrs="{'invisible': [('return_label', '=', False)]}" />
+			<field name="recipient_address" attrs="{'invisible': [('return_label', '=', False)]}" readonly="1"/>
 		    </group>
 		    <group>
 			<field name="carrier" invisible="1" />

@@ -105,14 +105,21 @@ class OmnishipProcessor(osv.osv_memory):
                        test=endicia_credentials[3],
                        )
 
+        if package.alternate_sender_address:
+            from_addr = package.alternate_sender_address
+            to_addr = package.picking.company_id.partner_id
+        else:
+            from_addr = package.picking.company_id.partner_id
+            to_addr = package.picking.partner_id
+
         from_address = address_obj.address_to_endicia_from_address(
             cr, uid,
-            package.picking.company_id.partner_id,
+            from_addr,
             context)
 
         to_address = address_obj.address_to_endicia_to_address(
             cr, uid,
-            package.picking.partner_id,
+            to_addr,
             context)
 
         shipping_label_api.add_data(from_address.data)
@@ -233,7 +240,8 @@ class OmnishipProcessor(osv.osv_memory):
                 'MailpieceShape': package.shape_dimension.value or 'Parcel',
                 'Value': value,
                 'Description': description[:50],
-                'IncludePostage':package.include_postage and 'TRUE' or 'FALSE',
+		'IncludePostage': 'TRUE',
+#                'IncludePostage':package.include_postage and 'TRUE' or 'FALSE',
                  }
         )
 

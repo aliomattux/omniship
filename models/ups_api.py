@@ -147,10 +147,17 @@ class OmnishipProcessor(osv.osv_memory):
 	omni_obj = self.pool.get('omniship')
         ups_shipper = omni_obj.get_ups_shipper(cr, uid, omni, context)
         #Fetch Addresses
+	if package.alternate_sender_address:
+	    from_addr = package.alternate_sender_address
+	    to_addr = package.picking.company_id.partner_id
+	else:
+	    from_addr = package.picking.company_id.partner_id
+	    to_addr = package.picking.partner_id
+
         to_address = address_obj.address_to_ups_dict(
-            cr, uid, package.picking.partner_id, context)
+            cr, uid, to_addr, context)
         from_address = address_obj.address_to_ups_dict(
-            cr, uid, package.picking.company_id.partner_id, context)
+            cr, uid, from_addr, context)
         shipper_address = address_obj.address_to_ups_dict(
             cr, uid, package.picking.company_id.partner_id, context)
         # Generating the XML Elements
@@ -235,8 +242,6 @@ class OmnishipProcessor(osv.osv_memory):
 	omni_obj = self.pool.get('omniship')
         ups_shipper = omni_obj.get_ups_shipper(cr, uid, omni, context)
 
-	print 'WTF', ups_shipper
-
         payment_info_prepaid = \
             ShipmentConfirm.payment_information_prepaid_type(
                 AccountNumber=ups_shipper)
@@ -314,7 +319,6 @@ class OmnishipProcessor(osv.osv_memory):
  #               [pkg.id for pkg in shipment_record.package_det],
   #              {'state': 'confirmed'}, context)
 
-	print 'GOT THIS FAR'
         self.accept_price(cr, uid, omni, package, context=None)
         return True
 

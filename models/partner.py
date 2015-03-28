@@ -24,9 +24,28 @@ class ResPartner(osv.osv):
 
             phone = "".join([char for char in phone if char in string.digits])
 
+	#Solves bug in XML request if address contains carriage returns
+        address_data = address.street.replace('\r', '\n')
+        addr_lines = address_data.split('\n')
+
+        if len(addr_lines) > 1:
+            addr_line1 = addr_lines[0]
+	    if address.street2:
+		addr_line2 = addr_lines[1] + ' ' + address.street2
+	    else:
+                addr_line2 = addr_lines[1]
+
+
+        else:
+	    addr_line1 = address.street
+            addr_line2 = address.street2
+
+	if addr_line2 and len(addr_line2) > 35:
+	    addr_line2 = addr_line2[:35]
+
         return {
-            'line1' : address.street or 'Line 1',
-            'line2' : address.street2 or 'Line 2',
+            'line1' : addr_line1,
+            'line2' : addr_line2 or ' ',
             'city' : address.city or 'None',
             'postal_code' : address.zip or 'None',
             'country_code' : address.country_id and \
@@ -58,11 +77,29 @@ class ResPartner(osv.osv):
         if phone:
             phone = "".join([char for char in phone if char in string.digits])
 
+        #Solves bug in XML request if address contains carriage returns
+        address_data = address.street.replace('\r', '\n')
+        addr_lines = address_data.split('\n')
+
+        if len(addr_lines) > 1:
+            addr_line1 = addr_lines[0]
+            if address.street2:
+                addr_line2 = addr_lines[1] + ' ' + address.street2
+            else:
+                addr_line2 = addr_lines[1]
+
+
+        else:
+            addr_line1 = address.street
+            addr_line2 = address.street2
+
+        if addr_line2 and len(addr_line2) > 35:
+            addr_line2 = addr_line2[:35]
         return FromAddress(
                      FromName = address.name,
 #                     FromCompany = uid_rec.company_id.name or None,
-                     ReturnAddress1 = address.street or None,
-                     ReturnAddress2 = address.street2 or None,
+                     ReturnAddress1 = addr_line1 or None,
+                     ReturnAddress2 = addr_line2 or None,
                      ReturnAddress3 = None,
                      ReturnAddress4 = None,
                      FromCity = address.city or None,

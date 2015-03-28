@@ -7,6 +7,8 @@ class OmnishipProcessor(osv.osv_memory):
         'declared_value': fields.float('Declared Value'),
 	'delivery_method': fields.many2one('delivery.carrier', 'Delivery Method', domain="[('service', '!=', False)]"),
 	'return_label': fields.boolean('Return Label'),
+	'alternate_sender_address': fields.many2one('res.partner', 'Alternate Sender Address'),
+	'recipient_address': fields.many2one('res.partner', 'Recipient Address'),
         'weight': fields.float('Package Weight'),
         'length': fields.float('Length'),
         'width': fields.float('Width'),
@@ -37,7 +39,7 @@ class OmnishipProcessor(osv.osv_memory):
 	picking_obj = self.pool.get('stock.picking')
         picking_ids = context.get('active_ids', [])
         picking = picking_obj.browse(cr, uid, picking_ids)[0]
-	res.update({'weight': 1.0})
+	res.update({'weight': 1.0, 'recipient_address': picking.company_id.partner_id.id})
 	if picking.carrier_id and picking.carrier_id.service:
 	    res.update({
 			'delivery_method': picking.carrier_id.id,
@@ -88,6 +90,11 @@ class OmnishipProcessor(osv.osv_memory):
 		'height': wizard.height or 0,
 		'declared_value': wizard.declared_value,
 	    }
+	    if wizard.return_label:
+		vals.update({
+			'alternate_sender_address': wizard.alternate_sender_address.id \
+				if wizard.alternate_sender_address else picking.partner_id.id,
+		})
 
 	    package_id = package_obj.create(cr, uid, vals)
 	    package = package_obj.browse(cr, uid, package_id)

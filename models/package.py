@@ -17,6 +17,7 @@ class StockOutPackage(osv.osv):
 #	'name': fields.function(_make_name, type="char", method=True, string='Name', select="1", size=150, store=True),
 	'refund_status': fields.text('Refund Status'),
 	'refund_approved': fields.boolean('Refund Approved'),
+	'alternate_sender_address': fields.many2one('res.partner', 'Alternate Sender Address'),
         'label_sub_type': fields.selection([
                 ('None', 'None'),
                 ('Integrated', 'Integrated')
