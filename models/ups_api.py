@@ -256,7 +256,7 @@ class OmnishipProcessor(osv.osv_memory):
 	    raise osv.except_osv(_('Error!'),_("Delivery method has no service: %s")% package.picking.carrier_id.name)
 
 	if not package.picking.carrier_id.service.service_code:
-	    raise osv.except_osv(_('Error!'),_("No Technical Carrier Code for Service: %s")% package.picking.carrier_id.service_type.name)
+	    raise osv.except_osv(_('Error!'),_("The Carrier %s is not a valid UPS Shipping Method")% package.picking.carrier_id.service.name)
 
         service = ShipmentConfirm.service_type(
             Code=package.picking.carrier_id.service.service_code)
